@@ -1,0 +1,22 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Backend
+Main/target/
+
+# Frontend
+milk-shop-frontend/node_modules/
+milk-shop-frontend/dist/
+milk-shop-frontend/.env
+milk-shop-frontend/.env.*
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
