@@ -20,3 +20,4 @@ milk-shop-frontend/.env.*
 # OS
 .DS_Store
 Thumbs.db
+Main/Main/src/main/resources/application-local.properties
