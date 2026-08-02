@@ -814,8 +814,16 @@ overlay: {
               <h3 style={{ margin: 0, fontSize: 16 }}>{cat.name}</h3>
               <span style={{ fontSize: 12, color: dm ? "#64748b" : "#9ca3af", background: dm ? "#2d3748" : "#f3f4f6", padding: "2px 8px", borderRadius: 10 }}>{catProds.length}</span>
             </div>
-            <div style={{ ...css.card, padding: 0, overflow: "hidden" }}>
-              <table style={css.table}>
+            <div
+  style={{
+    ...css.card,
+    padding: 0,
+    overflowX: "auto",
+    overflowY: "hidden",
+    WebkitOverflowScrolling: "touch",
+  }}
+>
+              <table style={{ ...css.table, minWidth: 920 }}>
                 <thead>
                   <tr>
                     {["Product", "Default Stock", "Current Stock", "Sold Today", "Remaining", "Alert Level", "Status", "Actions"].map(h => (
@@ -932,7 +940,9 @@ overlay: {
           <div style={{ fontSize: 16 }}>No history yet. Use "Prepare Next Day" to archive daily records.</div>
         </div>
       ) : (
-        <div style={{ ...css.card, padding: 0, overflow: "hidden" }}>
+        <div style={{ ...css.card, padding: 0, overflowX: "auto",
+overflowY: "hidden",
+WebkitOverflowScrolling: "touch", }}>
           <table style={css.table}>
             <thead>
               <tr>{["Date", "Product", "Category", "Opening Stock", "Units Sold", "Closing Stock"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr>
@@ -1021,7 +1031,9 @@ overlay: {
         )}
 
         {/* Per-product report */}
-        <div style={{ ...css.card, marginTop: 20, padding: 0, overflow: "hidden" }}>
+        <div style={{ ...css.card, marginTop: 20, padding: 0,  overflowX: "auto",
+overflowY: "hidden",
+WebkitOverflowScrolling: "touch",}}>
           <div style={{ padding: "16px 20px", borderBottom: `1px solid ${dm ? "#2d3748" : "#e5e7eb"}` }}>
             <h3 style={{ margin: 0, fontSize: 15 }}>Current Day Product Report</h3>
           </div>
@@ -1103,7 +1115,9 @@ overlay: {
           <div>No activity logged yet.</div>
         </div>
       ) : (
-        <div style={{ ...css.card, padding: 0, overflow: "hidden" }}>
+        <div style={{ ...css.card, padding: 0, overflowX: "auto",
+overflowY: "hidden",
+WebkitOverflowScrolling: "touch", }}>
           <table style={css.table}>
             <thead>
               <tr>{["Time", "Date", "Action", "Product", "Detail"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr>
