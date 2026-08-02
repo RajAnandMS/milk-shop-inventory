@@ -66,7 +66,13 @@ const STATUS_LABELS = { available: "Available", low: "Low Stock", out: "Out of S
 export default function MilkShopApp() {
   const [darkMode, setDarkMode] = useState(false);
   const [activeView, setActiveView] = useState("dashboard");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
+
+  const [sidebarOpen, setSidebarOpen] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true
+  );
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [history, setHistory] = useState([]);
@@ -99,6 +105,26 @@ export default function MilkShopApp() {
   const [graphProduct, setGraphProduct] = useState("all");
 
   const dm = darkMode;
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const navigateTo = (view) => {
+    setActiveView(view);
+
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
 
   const showNotif = useCallback((msg, type = "success") => {
     setNotification({ msg, type });
@@ -413,9 +439,26 @@ export default function MilkShopApp() {
 
   const css = {
     app: { minHeight: "100vh", display: "flex", background: dm ? "#0f1117" : "#f5f7fa", fontFamily: "system-ui, -apple-system, sans-serif", color: dm ? "#e2e8f0" : "#1a202c" },
-    sidebar: { width: sidebarOpen ? 240 : 60, background: dm ? "#1a1f2e" : "#1a2744", transition: "width 0.2s", display: "flex", flexDirection: "column", minHeight: "100vh", flexShrink: 0 },
+    sidebar: {
+      width: isMobile ? 260 : (sidebarOpen ? 240 : 60),
+      background: dm ? "#1a1f2e" : "#1a2744",
+      transition: isMobile ? "transform 0.25s ease" : "width 0.2s",
+      display: "flex",
+      flexDirection: "column",
+      minHeight: "100vh",
+      flexShrink: 0,
+      ...(isMobile
+        ? {
+            position: "fixed",
+            inset: "0 auto 0 0",
+            zIndex: 1000,
+            transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+            boxShadow: sidebarOpen ? "16px 0 40px rgba(0,0,0,0.25)" : "none",
+          }
+        : {}),
+    },
     main: { flex: 1, overflow: "auto", minWidth: 0 },
-    header: { background: dm ? "#1a1f2e" : "#fff", borderBottom: `1px solid ${dm ? "#2d3748" : "#e2e8f0"}`, padding: "12px 24px", display: "flex", alignItems: "center", gap: 16, position: "sticky", top: 0, zIndex: 10 },
+    header: { background: dm ? "#1a1f2e" : "#fff", borderBottom: `1px solid ${dm ? "#2d3748" : "#e2e8f0"}`, padding: isMobile ? "10px 14px" : "12px 24px", display: "flex", alignItems: "center", gap: 16, position: "sticky", top: 0, zIndex: 10 },
     card: { background: dm ? "#1e2535" : "#fff", borderRadius: 12, border: `1px solid ${dm ? "#2d3748" : "#e8ecf0"}`, padding: "20px 24px" },
     input: { background: dm ? "#2d3748" : "#f9fafb", border: `1px solid ${dm ? "#4a5568" : "#d1d5db"}`, borderRadius: 8, padding: "8px 12px", color: dm ? "#e2e8f0" : "#1a202c", fontSize: 14, width: "100%", outline: "none" },
     btn: (variant = "default") => ({
@@ -436,6 +479,28 @@ export default function MilkShopApp() {
       color: active ? "#fff" : "#94a3b8", background: active ? "rgba(255,255,255,0.12)" : "transparent",
       borderRadius: 8, margin: "2px 8px", transition: "all 0.15s", fontSize: 14,
     }),
+menuButton: {
+  display: isMobile ? "inline-flex" : "none",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 38,
+  height: 38,
+  border: "none",
+  borderRadius: 10,
+  background: dm ? "#2d3748" : "#eff6ff",
+  color: dm ? "#e2e8f0" : "#1d4ed8",
+  fontSize: 20,
+  fontWeight: 700,
+  cursor: "pointer",
+  flexShrink: 0,
+},
+
+overlay: {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(15, 23, 42, 0.45)",
+  zIndex: 999,
+},
     modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
     modalBox: { background: dm ? "#1e2535" : "#fff", borderRadius: 16, padding: 28, width: "min(480px, 90vw)", maxHeight: "85vh", overflowY: "auto" },
     label: { fontSize: 12, fontWeight: 600, color: dm ? "#94a3b8" : "#6b7280", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: "0.05em" },
@@ -1293,6 +1358,9 @@ export default function MilkShopApp() {
 
   return (
     <div style={css.app}>
+        {isMobile && sidebarOpen && (
+          <div style={css.overlay} onClick={() => setSidebarOpen(false)} />
+        )}
       {/* Sidebar */}
       <div style={css.sidebar}>
         <div style={{ padding: sidebarOpen ? "20px 16px 16px" : "20px 8px 16px", borderBottom: `1px solid rgba(255,255,255,0.08)` }}>
@@ -1313,7 +1381,7 @@ export default function MilkShopApp() {
 
         <nav style={{ flex: 1, padding: "12px 0" }}>
           {NAV.map(item => (
-            <div key={item.id} style={css.navItem(activeView === item.id)} onClick={() => setActiveView(item.id)}>
+            <div key={item.id} style={css.navItem(activeView === item.id)} onClick={() => navigateTo(item.id)}>
               <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
               {sidebarOpen && <span style={{ fontSize: 13 }}>{item.label}</span>}
             </div>
@@ -1332,6 +1400,13 @@ export default function MilkShopApp() {
       <div style={css.main}>
         {/* Header */}
         <div style={css.header}>
+            <button
+              style={css.menuButton}
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              ☰
+            </button>
           <div style={{ flex: 1 }}>
             <span style={{ fontWeight: 600, fontSize: 15 }}>
               {NAV.find(n => n.id === activeView)?.label.replace(/\s\(\d+\)/, "")}

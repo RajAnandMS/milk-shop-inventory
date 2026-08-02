@@ -34,3 +34,19 @@ button {
 table {
   width: 100%;
 }
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  table {
+    min-width: 760px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    min-height: 38px;
+  }
+}
